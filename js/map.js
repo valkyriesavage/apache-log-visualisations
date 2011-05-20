@@ -5,72 +5,52 @@ var pointsToMap = [];
 function initialize_map() {
     var SLAC = new google.maps.LatLng(37.418265, -122.2008149);
     var worldCentredOnSLAC = {
-      zoom: 5,
+      zoom: 6,
       center: SLAC,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
 
     map = new google.maps.Map(document.getElementById("map_canvas"),
             worldCentredOnSLAC);
-    read_lat_longs_ajax('noneayobeeswax');
+    console.log('yay we have a map');
+    request_lat_longs_ajax('noneayobeeswax');
 }
 
-function read_lat_longs_ajax(timer){
-    try{
-        // Opera 8.0+, Firefox, Safari
-        ajaxRequest = new XMLHttpRequest();
-        console.log('we have a request');
-    } catch (e) {
-        // Internet Explorer Browsers
-        try{
-            ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
-        } catch (e) {
-            try{
-                ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
-            } catch (e) {
-                // Something went wrong
-                console.log("Get a real browser.");
-                console.log(e);
-                return false;
-            }
-        }
-    }
-    ajaxRequest.onreadystatechange = get_new_points;
-    ajaxRequest.open("POST", "http://localhost/cgi-bin/searchesmap.py", true);
-    ajaxRequest.send(null);
-    console.log('request to server sent');
+function request_lat_longs_ajax(timer){
+    $.getJSON('http://localhost/cgi-bin/searchesmap.py',
+              {},
+              read_lat_longs_ajax);
+    console.log('request sent to server');
     wait_a_moment(timer);
 }
 
 function wait_a_moment(timer) {
-    t = setTimeout("read_lat_longs_ajax()", 4000);
-    t = setTimeout("map_new_point()", 4000);
+    t = setTimeout("request_lat_longs_ajax()", 2000);
+    t = setTimeout("map_new_point()", 2000);
 }
 
-function get_new_points() {
-    if (ajaxRequest.readyState == 4) {
-        console.log(ajaxRequest);
-        console.log(ajaxRequest.responseText);
-        allPoints = ajaxRequest.responseText.split("\n");
-        console.log(allPoints);
-        eval(allPoints);
-        console.log(allPoints);
-        for (i = pointsToMap.length - 1; i < allPoints.length - 1; i++) {
-            pointsToMap.push(allPoints[i]);
-        }
-        console.log('points retrieved');
+function read_lat_longs_ajax(data, textStatus, jqXHR) {
+    if (data[0] == "") {
+        console.log('no response from server')
     }
     else {
-        console.log(ajaxRequest);
+        console.log('points retrieved');
+        for (var i = pointsToMap.length; i < data.length - 1; i++) {
+            pointsToMap.push(data[i]);
+        }
     }
 }
 
 function map_new_point() {
-    point = pointsToMap.shift();
-    console.log(point);
-    point = point.split(' ');
-    latitude = point[0];
-    longitude = point[1];
+    if (pointsToMap.length < 1) {
+        console.log('no points to map');
+        return 1;
+    }
+    point_and_search = pointsToMap.shift();
+    console.log(point_and_search);
+    latitude = point_and_search['latitude'];
+    longitude = point_and_search['longitude'];
+    search = point_and_search['search'];
     drop_point(map, latitude, longitude);
 }
 
@@ -83,5 +63,5 @@ function drop_point(map, latitude, longitude) {
         position: accessedPoint,
         icon: 'http://localhost/img/john-ellis.jpg',
     });
-    //map.setCenter(accessedPoint);
+    map.setCenter(accessedPoint);
 }
