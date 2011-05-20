@@ -1,11 +1,13 @@
 #!/usr/bin/python
 
+import json
+import os
 from pygeoip import GeoIP
 import re
 import sys
 
-GI = GeoIP("/home/valkyrie/projects/inspire-log-viz/src/GeoLiteCity.dat")
-LOG_TO_READ = "/home/valkyrie/projects/inspire-log-viz/log.sample"
+GI = GeoIP("/path/to/GeoLiteCity.dat")
+LOG_TO_READ = "/path/to/log.sample"
 IP_REGEX = re.compile(r'(\d{1,3}.){4}')
 SEARCH_REGEX = re.compile(r'(p|p1)=(?P<search>.*?)(&|\s)')
 
@@ -41,10 +43,18 @@ def pull_list_from_log():
         ips_and_searches.append((ip, search))
     return ips_and_searches
 
-print "Content-type: text/html"
+print "Content-type: application/json"
 print
 
 ips_and_searches = pull_list_from_log()
+
+json_obj = []
 for ip, search in ips_and_searches:
     latitude, longitude = get_lat_long_pair(ip)
-    print str(latitude) + ' ' + str(longitude) + ' ' + search + '<br>'
+    json_obj.append({
+            "latitude": latitude,
+            "longitude" : longitude,
+            "search" : search
+            })
+
+print json.dumps(json_obj)

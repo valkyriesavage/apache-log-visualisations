@@ -1,0 +1,15 @@
+Necessary for use of this stuff:
+
+Apache logs, or logs formatted like
+    123.123.123.123 - someotherinfo...
+    234.234.234.234 - otherstuff...
+
+For showing searches in real-time on a Google map (searchesmap.py, searches-map.html):
+    The GeoIPLiteCity database from http://www.maxmind.com/app/geolitecity
+    The Python API for same from http://code.google.com/p/pygeoip/
+
+TODO:
+Show papers from Inspire piled up on their origin locations:
+    The code for the WebGL globe from http://www.chromeexperiments.com/globe
+Show heat maps of papers on their origin locations:
+    The code for Google Maps heat overlays
