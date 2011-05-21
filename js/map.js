@@ -62,7 +62,7 @@ function drop_point(map, latitude, longitude, search) {
             draggable:true,
             animation: google.maps.Animation.DROP,
             position: accessedPoint,
-            icon: 'http://localhost/img/john-ellis.png',
+            icon: 'http://localhost/img/john-ellis.jpg',
             title: search,
         });
     }
@@ -72,7 +72,6 @@ function drop_point(map, latitude, longitude, search) {
             draggable:true,
             animation: google.maps.Animation.DROP,
             position: accessedPoint,
-            icon: 'http://localhost/img/beta.png',
             title: search,
         });
     }

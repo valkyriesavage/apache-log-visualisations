@@ -1,13 +1,15 @@
 #!/usr/bin/python
 
+import cgi
 import json
 import os
 from pygeoip import GeoIP
 import re
+import sqlite3
 import sys
 
-GI = GeoIP("/path/to/GeoLiteCity.dat")
-LOG_TO_READ = "/path/to/log.sample"
+GI = GeoIP("/home/valkyrie/projects/inspire-log-viz/src/GeoLiteCity.dat")
+LOG_TO_READ = "/home/valkyrie/projects/inspire-log-viz/log.sample"
 IP_REGEX = re.compile(r'(\d{1,3}.){4}')
 SEARCH_REGEX = re.compile(r'(p|p1)=(?P<search>.*?)(&|\s)')
 
@@ -30,7 +32,15 @@ def prettify_search(search):
     search = URLDECODE(search)
     return search
 
-def pull_list_from_log():
+def pull_list_from_db(mapped):
+    conn = sqlite3.connect("/tmp/logtailer")
+    db = conn.cursor()
+    db.execute("select * from ip_search where rowid="+mapped+";")
+    for row in db:
+        # should only ever be one!
+        return row
+
+def pull_list_from_log(mapped):
     log = open(LOG_TO_READ)
     ips_and_searches = []
     for line in log:
@@ -40,13 +50,18 @@ def pull_list_from_log():
         if not IP_REGEX.match(ip):
             continue
         search = prettify_search(get_search_from_line(line))
+        #search = mapped
         ips_and_searches.append((ip, search))
     return ips_and_searches
 
 print "Content-type: application/json"
 print
 
-ips_and_searches = pull_list_from_log()
+form = cgi.FieldStorage()
+if form.has_key('mapped'):
+    ips_and_searches = pull_list_from_db(form['mapped'])
+else:
+    ips_and_searches = pull_list_from_log('')
 
 json_obj = []
 for ip, search in ips_and_searches:
