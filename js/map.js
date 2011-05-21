@@ -1,6 +1,7 @@
 var map = null;
 var ajaxRequest = null;
 var pointsToMap = [];
+var mapped = 0;
 
 function initialize_map() {
     var SLAC = new google.maps.LatLng(37.418265, -122.2008149);
@@ -12,13 +13,12 @@ function initialize_map() {
 
     map = new google.maps.Map(document.getElementById("map_canvas"),
             worldCentredOnSLAC);
-    console.log('yay we have a map');
     request_lat_longs_ajax();
 }
 
 function request_lat_longs_ajax(timer){
     $.getJSON('http://localhost/cgi-bin/searchesmap.py',
-              {'since': 'a'},
+              { 'mapped' :  mapped },
               read_lat_longs_ajax);
     console.log('request sent to server');
     wait_a_moment(timer);
@@ -35,7 +35,6 @@ function read_lat_longs_ajax(data, textStatus, jqXHR) {
     }
     else {
         console.log('points retrieved');
-        //pointsToMap.push(data);
         for (var i = 0; i < data.length - 1; i++) {
             pointsToMap.push(data[i]);
         }
@@ -48,11 +47,11 @@ function map_new_point() {
         return 1;
     }
     point_and_search = pointsToMap.shift();
-    console.log(point_and_search);
     latitude = point_and_search['latitude'];
     longitude = point_and_search['longitude'];
     search = point_and_search['search'];
     drop_point(map, latitude, longitude, search);
+    mapped += 1;
 }
 
 function drop_point(map, latitude, longitude, search) {
@@ -62,7 +61,7 @@ function drop_point(map, latitude, longitude, search) {
         draggable:true,
         animation: google.maps.Animation.DROP,
         position: accessedPoint,
-        icon: 'http://localhost/img/john-ellis.jpg',
+        icon: 'http://localhost/img/beta.png',
         title: search,
     });
     map.setCenter(accessedPoint);
