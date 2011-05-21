@@ -17,8 +17,8 @@ function initialize_map() {
 }
 
 function request_lat_longs_ajax(timer){
-    $.getJSON('http://localhost/cgi-bin/searchesmap.py',
-              { 'mapped' :  mapped },
+    $.getJSON('http://localhost/cgi-bin/searchesmap.py?mapped='+mapped,
+              {},
               read_lat_longs_ajax);
     console.log('request sent to server');
     wait_a_moment(timer);
@@ -34,10 +34,8 @@ function read_lat_longs_ajax(data, textStatus, jqXHR) {
         console.log('no response from server')
     }
     else {
-        console.log('points retrieved');
-        for (var i = 0; i < data.length - 1; i++) {
-            pointsToMap.push(data[i]);
-        }
+        console.log('point retrieved');
+        pointsToMap.push(data);
     }
 }
 

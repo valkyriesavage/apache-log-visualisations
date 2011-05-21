@@ -43,5 +43,5 @@ if __name__ == '__main__':
         search = prettify_search(get_search_from_line(line))
 
         db.execute("insert into ip_search values ('%s', '%s')" %\
-                    (ip, search))
+                    (ip, search.replace("'", '%%QUOTE%%')))
         conn.commit()
