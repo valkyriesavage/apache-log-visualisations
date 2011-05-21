@@ -56,13 +56,25 @@ function map_new_point() {
 
 function drop_point(map, latitude, longitude, search) {
     accessedPoint = new google.maps.LatLng(latitude, longitude);
-    marker = new google.maps.Marker({
-        map:map,
-        draggable:true,
-        animation: google.maps.Animation.DROP,
-        position: accessedPoint,
-        icon: 'http://localhost/img/beta.png',
-        title: search,
-    });
+    if (search.search('ellis') > -1) {
+        marker = new google.maps.Marker({
+            map:map,
+            draggable:true,
+            animation: google.maps.Animation.DROP,
+            position: accessedPoint,
+            icon: 'http://localhost/img/john-ellis.png',
+            title: search,
+        });
+    }
+    else {
+        marker = new google.maps.Marker({
+            map:map,
+            draggable:true,
+            animation: google.maps.Animation.DROP,
+            position: accessedPoint,
+            icon: 'http://localhost/img/beta.png',
+            title: search,
+        });
+    }
     map.setCenter(accessedPoint);
 }
