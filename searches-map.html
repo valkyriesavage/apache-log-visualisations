@@ -11,10 +11,23 @@
 <script type="text/javascript"
     src="http://maps.google.com/maps/api/js?sensor=true">
 </script>
-<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript"
+    src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_packed.js">
+</script>
+<script type="text/javascript"
+    src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js">
+</script>
 <script type="text/javascript" src="js/map.js"></script>
 </head>
 <body onload="initialize_map()">
-  <div id="map_canvas" style="width:100%; height:100%"></div>
+  <div id="map_canvas" style="width:100%; height:90%"></div>
+  <div id="controls" style="width:100%; height:10%">
+    <div id="faster-label" style="display:inline">faster</div>
+    <input type="range" min="1" max="11" value="7" onchange="change_speed(this.value)"/>
+    <div id="slower-label" style="display:inline">slower</div>
+    <button type="button" id="runButton" name="runButton" onclick="toggle_run(this)">pause</button>
+    <!--<input type="checkbox" id="cluster" name="cluster" checked=true onclick="toggle_clustering()"/>cluster-->
+    <div id="searched" name="searched" style="display:inline"></div>
+  </div>
 </body>
 </html>
