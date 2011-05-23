@@ -2,6 +2,7 @@ var map = null;
 var ajaxRequest = null;
 var pointsToMap = [];
 var mapped = 0;
+var running = false;
 
 function initialize_map() {
     var SLAC = new google.maps.LatLng(37.418265, -122.2008149);
@@ -13,24 +14,31 @@ function initialize_map() {
 
     map = new google.maps.Map(document.getElementById("map_canvas"),
             worldCentredOnSLAC);
+    toggle_run();
     request_lat_longs_ajax();
 }
 
-function request_lat_longs_ajax(timer){
-    $.getJSON('http://localhost/cgi-bin/searchesmap.py?mapped='+mapped,
+function toggle_run() {
+    running = !running;
+}
+
+function request_lat_longs_ajax(){
+    $.getJSON('http://inspire-viz.com/python/searchesmap.py?mapped='+mapped,
               {},
               read_lat_longs_ajax);
     console.log('request sent to server');
-    wait_a_moment(timer);
+    wait_a_moment();
 }
 
-function wait_a_moment(timer) {
-    setTimeout("request_lat_longs_ajax()", 2000);
-    setTimeout("map_new_point()", 2000);
+function wait_a_moment() {
+    if (running) {
+        setTimeout("request_lat_longs_ajax()", 1000);
+        setTimeout("map_new_point();", 1000);
+    }
 }
 
 function read_lat_longs_ajax(data, textStatus, jqXHR) {
-    if (data[0] == "") {
+    if (data == null || data.length == 0 || data[0] == "") {
         console.log('no response from server')
     }
     else {
@@ -60,7 +68,7 @@ function drop_point(map, latitude, longitude, search) {
             draggable:true,
             animation: google.maps.Animation.DROP,
             position: accessedPoint,
-            icon: 'http://localhost/img/john-ellis.jpg',
+            icon: 'images/john-ellis.jpg',
             title: search,
         });
     }
@@ -73,5 +81,5 @@ function drop_point(map, latitude, longitude, search) {
             title: search,
         });
     }
-    map.setCenter(accessedPoint);
+    //map.setCenter(accessedPoint);
 }
