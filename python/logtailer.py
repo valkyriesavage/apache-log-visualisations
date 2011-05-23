@@ -20,7 +20,9 @@ def follow(log):
         yield line
 
 def get_search_from_line(line):
-    return SEARCH_REGEX.search(line).group('search')
+    if SEARCH_REGEX.search(line):
+        return SEARCH_REGEX.search(line).group('search')
+    return ''
 
 def prettify_search(search):
     search = search.lower()
