@@ -8,11 +8,10 @@ var markersAdded = [];
 
 var requested = -1;
 
-var clustering = false;
 var running = true;
 var speed = .7;
 
-function initialize_map() {
+function initialize_map(cluster) {
     var SLAC = new google.maps.LatLng(37.418265, -122.2008149);
     var worldCentredOnSLAC = {
       zoom: 2,
@@ -22,26 +21,14 @@ function initialize_map() {
 
     map = new google.maps.Map(document.getElementById("map_canvas"),
             worldCentredOnSLAC);
-    //toggle_clustering();
     wait_a_moment();
+    if (cluster) {
+        toggle_clustering();
+    }
 }
 
 function toggle_clustering() {
-    clustering = !clustering;
-    if (clustering) {
-        if (!clusterer) {
-            clusterer = new MarkerClusterer(map);
-        }
-        else {
-            clusterer.addMarkers(markersAdded);
-        }
-    }
-    else {
-        clusterer.clearMarkers();
-        for (marker in markersAdded) {
-            marker.setVisible(true);
-        }
-    }
+    clusterer = new MarkerClusterer(map);
 }
 
 function toggle_run(button) {
@@ -131,7 +118,7 @@ function drop_point(latitude, longitude, search) {
     marker.click = "update_searched('"+marker.title+"');";
     update_searched(search);
     markersAdded.push((marker, timestamp));
-    if (clustering) {
+    if (clusterer) {
         clusterer.addMarker(marker);
     }
 }
