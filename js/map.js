@@ -6,7 +6,7 @@ var ajaxRequest = null;
 var pointsToMap = [];
 var markersAdded = [];
 
-var requested = 0;
+var requested = -1;
 
 var clustering = false;
 var running = true;
@@ -68,7 +68,9 @@ function request_lat_longs_ajax(){
         $.getJSON('http://inspire-viz.com/python/searchesmap.py?mapped='+requested,
                   {},
                   read_lat_longs_ajax);
-        requested += 1;
+        if (requested > 0) {
+            requested += 1;
+        }
     }
     wait_a_moment();
 }
@@ -98,12 +100,16 @@ function map_new_point() {
     latitude = point_and_search['latitude'];
     longitude = point_and_search['longitude'];
     search = point_and_search['search'];
-    drop_point(latitude, longitude, search);
+    timestamp = point_and_search['timestamp'];
+    if (requested < 0) {
+        requested = point_and_search['id'];
+    }
+    drop_point(latitude, longitude, search, timestamp);
 }
 
 function drop_point(latitude, longitude, search) {
     accessedPoint = new google.maps.LatLng(latitude, longitude);
-    if (search.search('ellis') > -1) {
+    if (search.search('ellis, j') > -1) {
         marker = new google.maps.Marker({
             map:map,
             draggable:true,
@@ -124,9 +130,8 @@ function drop_point(latitude, longitude, search) {
     }
     marker.click = "update_searched('"+marker.title+"');";
     update_searched(search);
-    markersAdded.push(marker);
+    markersAdded.push((marker, timestamp));
     if (clustering) {
         clusterer.addMarker(marker);
     }
-    //map.setCenter(accessedPoint);
 }

@@ -7,7 +7,8 @@ from urllib2 import unquote
 
 IP_REGEX = re.compile(r'(\d{1,3}.){4}')
 SEARCH_REGEX = re.compile(r'(p|p1)=(?P<search>.*?)(&|\s)')
-LOG_TO_READ = "/home/valkyrie/projects/inspire-log-viz/log.bigsample"
+LOG_TO_READ = "/opt/viz/log.bigsample"
+PID_FILE = "/tmp/logtailer.pid"
 
 def follow(log):
     # for live tailing, uncomment me!
@@ -33,7 +34,11 @@ def prettify_search(search):
 if __name__ == '__main__':
     conn = sqlite3.connect('/tmp/logtailer')
     db = conn.cursor()
-    db.execute("create table if not exists ip_search (ip, search);")
+    db.execute("""
+            create table if not exists ip_search
+            (rowid INTEGER PRIMARY KEY AUTOINCREMENT, ip TEXT,
+             search TEXT, timestamp DEFAULT CURRENT_TIMESTAMP);
+            """)
     log = open(LOG_TO_READ, 'r')
     loglines = follow(log)
     for line in loglines:
@@ -44,6 +49,6 @@ if __name__ == '__main__':
             continue
         search = prettify_search(get_search_from_line(line))
 
-        db.execute("insert into ip_search values ('%s', '%s')" %\
+        db.execute("insert into ip_search (ip, search) values ('%s', '%s')" %\
                     (ip, search.replace("'", '%%QUOTE%%')))
         conn.commit()
