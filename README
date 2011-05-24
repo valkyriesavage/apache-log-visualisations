@@ -1,12 +1,14 @@
 Necessary for use of this stuff:
 
+Python 2.5 (or desire to update some statements by hand)
+
 Apache logs, or logs formatted like
     123.123.123.123 - someotherinfo...
     234.234.234.234 - otherstuff...
 
 For showing searches in real-time on a Google map (searchesmap.py, searches-map.html):
-    The GeoIPLiteCity database from http://www.maxmind.com/app/geolitecity
-    The Python API for same from http://code.google.com/p/pygeoip/
+    The GeoIPLiteCity database from http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
+    The Python API for same from http://pygeoip.googlecode.com/files/pygeoip-0.1.5.tar.gz
     Sqlite3
 
     * to do this, be sure to run logtailer.py in the background on your machine

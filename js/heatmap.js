@@ -6,8 +6,6 @@ var ajaxRequest = null;
 var pointsToMap = [];
 var markersAdded = [];
 
-var requested = 0;
-
 var clustering = false;
 var running = true;
 var speed = .7;
@@ -65,10 +63,9 @@ function update_searched(search) {
 
 function request_lat_longs_ajax(){
     if (running) {
-        $.getJSON('http://inspire-viz.com/python/searchesmap.py?mapped='+requested,
+        $.getJSON('http://inspire-viz.com/python/searchesmap.py?mapped='+markersAdded.length,
                   {},
                   read_lat_longs_ajax);
-        requested += 1;
     }
     wait_a_moment();
 }
