@@ -6,6 +6,8 @@ var ajaxRequest = null;
 var pointsToMap = [];
 var markersAdded = [];
 
+var live = false;
+
 var requested = -1;
 
 var running = true;
@@ -23,11 +25,11 @@ function initialize_map(cluster) {
             worldCentredOnSLAC);
     wait_a_moment();
     if (cluster) {
-        toggle_clustering();
+        init_clustering();
     }
 }
 
-function toggle_clustering() {
+function init_clustering() {
     clusterer = new MarkerClusterer(map);
 }
 
@@ -41,6 +43,22 @@ function toggle_run(button) {
     }
 }
 
+function toggle_live(button) {
+    live = !live;
+    for (var i; i = 0; i < markersAdded.length) {
+        marker = markersAdded[i];
+        marker.setVisible(false);
+    }
+    markersAdded = [];
+    pointsToMap = [];
+    if (!live) {
+        button.innerHTML = 'live logs';
+    }
+    else {
+        button.innerHTML = 'replay of old logs';
+    }
+}
+
 function change_speed(newSpeed) {
     speed = newSpeed/10;
 }
@@ -50,9 +68,19 @@ function update_searched(search) {
             encodeURI(search.replace(/ /g, '+')) + '">' + search + '</a>';
 }
 
+function update_behind_count(current, total) {
+    if (live) {
+        document.getElementById('count').innerHTML = 'behind by ' + total-current + ' searches';
+    }
+    else {
+        document.getElementById('count').innerHTML = 'search ' + current + '/' + total;
+    }
+}
+
+
 function request_lat_longs_ajax(){
     if (running) {
-        $.getJSON('http://inspire-viz.com/python/searchesmap.py?mapped='+requested,
+        $.getJSON('http://inspire-viz.com/python/searchesmap.py?mapped='+requested+'&live='+live,
                   {},
                   read_lat_longs_ajax);
         if (requested > 0) {
@@ -83,39 +111,35 @@ function map_new_point() {
     if (!running) {
         return 0;
     }
-    point_and_search = pointsToMap.shift();
-    latitude = point_and_search['latitude'];
-    longitude = point_and_search['longitude'];
-    search = point_and_search['search'];
-    timestamp = point_and_search['timestamp'];
+
+    data = pointsToMap.shift();
+
+    totalRows = data[0];
+
+    pointAndSearch = data[1];
+    latitude = pointAndSearch['latitude'];
+    longitude = pointAndSearch['longitude'];
+    search = pointAndSearch['search'];
+    timestamp = pointAndSearch['timestamp'];
+
+    update_behind_count(pointAndSearch['id'], totalRows);
+
     if (requested < 0) {
-        requested = point_and_search['id'];
+        requested = pointAndSearch['id'];
     }
     drop_point(latitude, longitude, search, timestamp);
 }
 
 function drop_point(latitude, longitude, search) {
     accessedPoint = new google.maps.LatLng(latitude, longitude);
-    if (search.search('ellis, j') > -1) {
-        marker = new google.maps.Marker({
-            map:map,
-            draggable:true,
-            animation: google.maps.Animation.DROP,
-            position: accessedPoint,
-            icon: 'http://inspire-viz.com/images/john-ellis.jpg',
-            title: search,
-        });
-    }
-    else {
-        marker = new google.maps.Marker({
-            map:map,
-            draggable:true,
-            animation: google.maps.Animation.DROP,
-            position: accessedPoint,
-            title: search,
-        });
-    }
-    marker.click = "update_searched('"+marker.title+"');";
+    marker = new google.maps.Marker({
+        map:map,
+        draggable:true,
+        animation: google.maps.Animation.DROP,
+        position: accessedPoint,
+        title: search,
+    });
+    marker.click = "update_searched('"+marker.getTitle()+"');";
     update_searched(search);
     markersAdded.push((marker, timestamp));
     if (clusterer) {
