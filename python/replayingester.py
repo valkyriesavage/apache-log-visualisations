@@ -9,6 +9,7 @@ import time
 from urllib2 import unquote
 
 IP_REGEX = re.compile(r'(\d{1,3}.){4}')
+TIMESTAMP_REGEX = re.compile(r'\d{2}/[a-zA-Z]+/\d{4}:\d{2}:\d{2}:\d{2}')
 SEARCH_REGEX = re.compile(r'(p|p1)=(?P<search>.*?)(&|\s)')
 REPLAY_LOG_TO_READ = "/opt/viz/log.oneday"
 PID_FILE = "/tmp/logtailer.pid"
@@ -35,7 +36,7 @@ if __name__ == '__main__':
     if already_run():
         print 'you already ran this!  if you want to update, remove ' + SQLITE_REPLAY_FILE
         sys.exit(0)
-    print 'not yet running... here we go!'
+    print 'not yet run... here we go!'
 
     replay_conn = sqlite3.connect(SQLITE_REPLAY_FILE)
     replay_db = replay_conn.cursor()
@@ -52,9 +53,10 @@ if __name__ == '__main__':
         if not IP_REGEX.match(ip):
             continue
         search = prettify_search(get_search_from_line(line))
+        timestamp = TIMESTAMP_REGEX.search(line).group(0)
 
-        replay_db.execute("insert into ip_search (ip, search) values ('%s', '%s')" %\
-                    (ip, search.replace("'", '%%QUOTE%%')))
+        replay_db.execute("insert into ip_search (ip, search, timestamp) values ('%s', '%s', '%s')" %\
+                    (ip, search.replace("'", '%%QUOTE%%'), timestamp))
         replay_conn.commit()
     replay_log.close()
     replay_conn.close()

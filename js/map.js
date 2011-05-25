@@ -11,18 +11,19 @@ var live = false;
 var requested = -1;
 
 var running = true;
-var speed = .7;
+var speed = 1;
 
 function initialize_map(cluster) {
     var SLAC = new google.maps.LatLng(37.418265, -122.2008149);
-    var worldCentredOnSLAC = {
+    var origin = new google.maps.LatLng(15, 0);
+    var worldCentredOnOrigin = {
       zoom: 2,
-      center: SLAC,
+      center: origin,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
 
     map = new google.maps.Map(document.getElementById("map_canvas"),
-            worldCentredOnSLAC);
+            worldCentredOnOrigin);
     wait_a_moment();
     if (cluster) {
         init_clustering();
@@ -68,12 +69,13 @@ function update_searched(search) {
             encodeURI(search.replace(/ /g, '+')) + '">' + search + '</a>';
 }
 
-function update_behind_count(current, total) {
+function update_behind_count(current, total, timestamp) {
     if (live) {
         document.getElementById('count').innerHTML = 'behind by ' + total-current + ' searches';
     }
     else {
-        document.getElementById('count').innerHTML = 'search ' + current + '/' + total;
+        document.getElementById('count').innerHTML = 'search ' + current + '/' + total + ' on ' +
+            timestamp.split(':')[0] + ' at ' + timestamp.split('2011:')[1] + ' GMT';
     }
 }
 
@@ -122,7 +124,7 @@ function map_new_point() {
     search = pointAndSearch['search'];
     timestamp = pointAndSearch['timestamp'];
 
-    update_behind_count(pointAndSearch['id'], totalRows);
+    update_behind_count(pointAndSearch['id'], totalRows, timestamp);
 
     if (requested < 0) {
         requested = pointAndSearch['id'];
@@ -132,13 +134,23 @@ function map_new_point() {
 
 function drop_point(latitude, longitude, search) {
     accessedPoint = new google.maps.LatLng(latitude, longitude);
-    marker = new google.maps.Marker({
-        map:map,
-        draggable:true,
-        animation: google.maps.Animation.DROP,
-        position: accessedPoint,
-        title: search,
-    });
+    if (speed >= 1) {
+        marker = new google.maps.Marker({
+            map:map,
+            draggable:true,
+            animation: google.maps.Animation.DROP,
+            position: accessedPoint,
+            title: search,
+        });
+    }
+    else {
+        marker = new google.maps.Marker({
+            map:map,
+            draggable:true,
+            position: accessedPoint,
+            title: search,
+        });
+    }
     marker.click = "update_searched('"+marker.getTitle()+"');";
     update_searched(search);
     markersAdded.push((marker, timestamp));
