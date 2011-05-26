@@ -22,8 +22,9 @@ function initialize_map(cluster) {
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
 
-    map = new google.maps.Map(document.getElementById("map_canvas"),
-            worldCentredOnOrigin);
+    map = new GMap2(document.getElementById("map_canvas"));
+    map.setCenter(origin, 2);
+    map.addControl(new GLargeMapControl());
     wait_a_moment();
     if (cluster) {
         init_clustering();
@@ -75,14 +76,14 @@ function update_behind_count(current, total, timestamp) {
     }
     else {
         document.getElementById('count').innerHTML = 'search ' + current + '/' + total + ' on ' +
-            timestamp.split(':')[0] + ' at ' + timestamp.split('2011:')[1] + ' GMT';
+            timestamp.split(':')[0] + ' at ' + timestamp.split('2011:')[1] + ' GMT+0200';
     }
 }
 
 
 function request_lat_longs_ajax(){
     if (running) {
-        $.getJSON('http://inspire-viz.com/python/searchesmap.py?mapped='+requested+'&live='+live,
+        $.getJSON('https://inspire.slac.stanford.edu/cgi-bin/searchesmap.py?mapped='+requested+'&live='+live,
                   {},
                   read_lat_longs_ajax);
         if (requested > 0) {
@@ -134,26 +135,17 @@ function map_new_point() {
 
 function drop_point(latitude, longitude, search) {
     accessedPoint = new google.maps.LatLng(latitude, longitude);
-    if (speed >= 1) {
-        marker = new google.maps.Marker({
-            map:map,
-            draggable:true,
-            animation: google.maps.Animation.DROP,
-            position: accessedPoint,
-            title: search,
-        });
+    if ((search.search('find ') == 0) ||
+		(search.search('fin ') == 0) ||
+		(search.search('f ') == 0)) {
+        map.addOverlay(new MarkerLight(accessedPoint, {
+	image: "https://inspire.slac.stanford.edu/vizzy/images/blueicon.png"}));
     }
     else {
-        marker = new google.maps.Marker({
-            map:map,
-            draggable:true,
-            position: accessedPoint,
-            title: search,
-        });
+        map.addOverlay(new MarkerLight(accessedPoint, {
+	image: "https://inspire.slac.stanford.edu/vizzy/images/redicon.png"}));
     }
-    marker.click = "update_searched('"+marker.getTitle()+"');";
     update_searched(search);
-    markersAdded.push((marker, timestamp));
     if (clusterer) {
         clusterer.addMarker(marker);
     }
