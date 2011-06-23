@@ -1,0 +1,16 @@
+var types = ["author", "find", "title"];
+
+var searches = [
+    { date: "06/13/2011", author: 350, find: 600, title: 100 },
+    { date: "06/14/2011", author: 50, find: 100, title: 120 },
+    { date: "06/15/2011", author: 500, find: 540, title: 160 },
+    { date: "06/16/2011", author: 125, find: 550, title: 80 },
+    { date: "06/17/2011", author: 80, find: 700, title: 60 },
+    { date: "06/17/2011", author: 110, find: 90, title: 70 },
+    { date: "06/17/2011", author: 120, find: 750, title: 80 },
+];
+
+(function() {
+  var format = pv.Format.date("%m/%d");
+  searches.forEach(function(d) { d.date = format.parse(d.date); });
+})();

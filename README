@@ -1,6 +1,6 @@
 Necessary for use of this stuff:
 
-Python 2.5 (or desire to update some statements by hand)
+Python 2.5+ (or desire to update some statements by hand)
 
 Apache logs, or logs formatted like
     123.123.123.123 - someotherinfo...
@@ -14,7 +14,6 @@ For showing searches in real-time on a Google map (searchesmap.py, searches-map.
     * to do this, be sure to run logtailer.py in the background on your machine
 
 TODO:
-Show papers from Inspire piled up on their origin locations:
-    The code for the WebGL globe from http://www.chromeexperiments.com/globe
 Show heat maps of papers on their origin locations:
     The code for Google Maps heat overlays
+Find something fun to show with protoviz
